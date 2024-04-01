@@ -1,0 +1,54 @@
+GET http://localhost:8080/api/v1/customers
+
+###
+
+POST http://localhost:8080/api/v1/customers
+accept: */*
+Content-Type: application/json
+
+{
+  "firstname": "Alex",
+  "lastname": "Aleksandrovich",
+  "surname": "Berezhnoy",
+  "birthDate": "29/12/1980",
+  "gender": "male",
+  "email": "berezhnoy_aa@mail.ru",
+  "phoneNumber": "+79994141041"
+}
+
+###
+
+PUT http://localhost:8080/api/v1/customers
+accept: */*
+Content-Type: application/json
+
+{
+  "id": 6,
+  "firstname": "Lesha",
+  "lastname": "Kruchina",
+  "surname": "Semen",
+  "birthDate": "1950-01-01",
+  "gender": "female",
+  "email": "ber_aa@mail.ru",
+  "phoneNumber": "+79286604657"
+}
+
+###
+
+DELETE http://localhost:8080/api/v1/customers/6
+
+###
+
+POST http://localhost:8080/api/v1/operations
+accept: */*
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "operationType": "LoanOperation",
+  "amount": 1000000,
+  "loanId": 1,
+  "description": "description fo loan"
+}
+
+###
