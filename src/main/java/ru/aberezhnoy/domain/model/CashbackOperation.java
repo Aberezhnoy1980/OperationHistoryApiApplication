@@ -3,7 +3,6 @@ package ru.aberezhnoy.domain.model;
 import ru.aberezhnoy.contract.Contract;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 public class CashbackOperation extends Operation implements Contract.Model.ConsolePrintable, Comparable<CashbackOperation> {
     private BigDecimal cashbackAmount;
@@ -12,6 +11,11 @@ public class CashbackOperation extends Operation implements Contract.Model.Conso
         super(customer, amount, description);
         this.cashbackAmount = this.getAmount().multiply(new BigDecimal("0.15"));
 
+    }
+
+    @Override
+    public String getType() {
+        return this.getClass().getSimpleName();
     }
 
     public CashbackOperation() {
@@ -29,7 +33,7 @@ public class CashbackOperation extends Operation implements Contract.Model.Conso
 
     @Override
     public int compareTo(CashbackOperation o) {
-        return this.getAmount().compareTo(o.getAmount());
+        return this.getDate().compareTo(o.getDate());
     }
 
     @Override

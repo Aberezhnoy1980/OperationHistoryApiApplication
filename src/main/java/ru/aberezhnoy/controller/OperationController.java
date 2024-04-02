@@ -8,10 +8,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.aberezhnoy.domain.model.Operation;
 import ru.aberezhnoy.dto.OperationDTO;
 import ru.aberezhnoy.exception.CustomerNotFound;
 import ru.aberezhnoy.exception.DataValidationException;
+import ru.aberezhnoy.service.AsyncInputOperationService;
 import ru.aberezhnoy.service.OperationService;
 
 import java.util.List;
@@ -22,20 +22,22 @@ import java.util.stream.Collectors;
 public class OperationController {
     private static final Logger logger = LogManager.getLogger(OperationController.class);
     private final OperationService operationService;
+    private final AsyncInputOperationService asyncInputOperationService;
 
     @Autowired
-    public OperationController(OperationService operationService) {
+    public OperationController(OperationService operationService, AsyncInputOperationService asyncInputOperationService) {
         this.operationService = operationService;
+        this.asyncInputOperationService = asyncInputOperationService;
     }
 
     @GetMapping
-    public List<OperationDTO.Request.OperationDto> findAll() {
+    public List<OperationDTO> findAll() {
         logger.info("Operation list requested");
         return operationService.findAll();
     }
 
     @PostMapping
-    public OperationDTO.Request.OperationDto createOperation(@RequestBody @Validated OperationDTO.Request.OperationDto operationDto, BindingResult bindingResult) {
+    public void createOperation(@RequestBody @Validated OperationDTO operationDto, BindingResult bindingResult) {
         logger.info("Saving  operation");
         if (bindingResult.hasErrors()) {
             logger.error(bindingResult.getAllErrors().toString());
@@ -43,12 +45,11 @@ public class OperationController {
                     .map(ObjectError::getDefaultMessage)
                     .collect(Collectors.toList()));
         }
-        Operation operation = operationService.save(operationDto);
-        return operationService.findById(operation.getId()).orElseThrow(() -> new CustomerNotFound(operation.getId()));
+        asyncInputOperationService.addOperation(operationDto);
     }
 
     @GetMapping("/{id}")
-    public OperationDTO.Request.OperationDto findById(@PathVariable Long id) {
+    public OperationDTO findById(@PathVariable Long id) {
         logger.info("Operation with id = {} requested", id);
         return operationService.findById(id).orElseThrow(() -> new CustomerNotFound(id));
     }

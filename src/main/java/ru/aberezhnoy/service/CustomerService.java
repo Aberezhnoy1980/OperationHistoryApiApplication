@@ -3,10 +3,12 @@ package ru.aberezhnoy.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.aberezhnoy.contract.Contract;
-import ru.aberezhnoy.dto.CustomerDto;
+import ru.aberezhnoy.dto.CustomerDTO;
 import ru.aberezhnoy.exception.CustomerNotFound;
 import ru.aberezhnoy.exception.DataSourceException;
 import ru.aberezhnoy.domain.model.Customer;
+import ru.aberezhnoy.util.mapper.CustomerDTOMapper;
+import ru.aberezhnoy.util.mapper.CustomerModelMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,19 +17,21 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerService {
     private final Contract.Model<Customer> customerRepository;
+    private final CustomerDTOMapper customerDTOMapper;
+
+    private final CustomerModelMapper customerModelMapper;
 
     @Autowired
-    public CustomerService(Contract.Model<Customer> customerRepository) {
+    public CustomerService(Contract.Model<Customer> customerRepository, CustomerDTOMapper customerDTOMapper, CustomerModelMapper customerModelMapper) {
         this.customerRepository = customerRepository;
+        this.customerDTOMapper = customerDTOMapper;
+        this.customerModelMapper = customerModelMapper;
     }
 
-    public List<CustomerDto> findAll() {
+    public List<CustomerDTO> findAll() {
         return customerRepository.findAll().orElseThrow(DataSourceException::new).stream()
-                .map(this::mapToCustomerDto)
+                .map(customerDTOMapper)
                 .collect(Collectors.toList());
-//        return customerRepository.findAll().stream()
-//                .map(CustomerDto::new)
-//                .collect(Collectors.toList());
     }
 
     /**
@@ -36,8 +40,8 @@ public class CustomerService {
      * @param customer
      * @return customerDto
      */
-    private CustomerDto mapToCustomerDto(Customer customer) {
-        return new CustomerDto(customer);
+    private CustomerDTO mapToCustomerDto(Customer customer) {
+        return new CustomerDTO(customer);
     }
 
     /**
@@ -46,7 +50,7 @@ public class CustomerService {
      * @param customerDto
      * @return customer
      */
-    private Customer mapToCustomer(CustomerDto customerDto) {
+    private Customer mapToCustomer(CustomerDTO customerDto) {
         return Customer.builder()
                 .setFirstname(customerDto.getFirstname())
                 .setLastname(customerDto.getLastname())
@@ -58,15 +62,15 @@ public class CustomerService {
                 .build();
     }
 
-    public Optional<CustomerDto> findById(long id) {
-        return customerRepository.findById(id).map(this::mapToCustomerDto);
+    public Optional<CustomerDTO> findById(long id) {
+        return customerRepository.findById(id).map(customerDTOMapper);
     }
 
-    public Customer save(CustomerDto customerDto) {
-        return customerRepository.save(mapToCustomer(customerDto));
+    public Customer save(CustomerDTO customerDto) {
+        return customerRepository.save(customerModelMapper.apply(customerDto));
     }
 
-    public void update(CustomerDto customerDto) {
+    public void update(CustomerDTO customerDto) {
         Customer customer = customerRepository.findById(customerDto.getId())
                 .orElseThrow(() -> new CustomerNotFound(customerDto.getId()));
 
@@ -90,5 +94,17 @@ public class CustomerService {
 
     public void removeById(long id) {
         customerRepository.removeById(id);
+    }
+
+    public Contract.Model<Customer> getCustomerRepository() {
+        return customerRepository;
+    }
+
+    public CustomerDTOMapper getCustomerDTOMapper() {
+        return customerDTOMapper;
+    }
+
+    public CustomerModelMapper getCustomerModelMapper() {
+        return customerModelMapper;
     }
 }

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.aberezhnoy.controller.CustomerController;
-import ru.aberezhnoy.dto.CustomerDto;
+import ru.aberezhnoy.dto.CustomerDTO;
 import ru.aberezhnoy.exception.CustomerNotFound;
 import ru.aberezhnoy.service.CustomerService;
 
@@ -22,12 +22,12 @@ public class CustomerControllerTest {
 
     @Test
     public void getClientByIdAndUpdateTest() {
-        CustomerDto customerDto1 = cc.findById(1L);
-        customerDto1.setFirstname("JUnitTestWithId1");
-        cs.update(customerDto1);
-        CustomerDto customerDto2 = cc.findById(2L);
-        customerDto2.setLastname("JUnitTestWithId2");
-        cs.update(customerDto2);
+        CustomerDTO customerDTO1 = cc.findById(1L);
+        customerDTO1.setFirstname("JUnitTestWithId1");
+        cs.update(customerDTO1);
+        CustomerDTO customerDTO2 = cc.findById(2L);
+        customerDTO2.setLastname("JUnitTestWithId2");
+        cs.update(customerDTO2);
         assertEquals(1, cc.findById(1L).getId());
         assertEquals("JUnitTestWithId1", cc.findById(1L).getFirstname());
         assertEquals(2, cc.findById(2L).getId());
@@ -47,7 +47,7 @@ public class CustomerControllerTest {
         for (long i = 1; i <= size; i++) {
             expectedValues.add(cc.findById(i).getEmail());
         }
-        assertIterableEquals(expectedValues, cc.findAll().stream().map(CustomerDto::getEmail).toList());
+        assertIterableEquals(expectedValues, cc.findAll().stream().map(CustomerDTO::getEmail).toList());
     }
 
     @Test

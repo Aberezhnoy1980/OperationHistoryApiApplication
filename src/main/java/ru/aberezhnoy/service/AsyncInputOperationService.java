@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.aberezhnoy.config.OperationProperties;
-import ru.aberezhnoy.domain.model.Operation;
 import ru.aberezhnoy.dto.OperationDTO;
 
 import java.util.LinkedList;
@@ -17,7 +16,7 @@ import java.util.Queue;
 public class AsyncInputOperationService {
     private static final Logger LOGGER = LogManager.getLogger(AsyncInputOperationService.class);
     private final OperationProperties operationProperties;
-    private final Queue<OperationDTO.Request.OperationDto> operationQueue;
+    private final Queue<OperationDTO> operationQueue;
     private final OperationService operationService;
 
     @Autowired
@@ -39,7 +38,7 @@ public class AsyncInputOperationService {
 
     private void processQueue() {
         while (true) {
-            OperationDTO.Request.OperationDto operationDto = operationQueue.poll();
+            OperationDTO operationDto = operationQueue.poll();
             if (operationDto == null) {
                 try {
                     LOGGER.info("Waiting for next operation in queue");
@@ -54,11 +53,11 @@ public class AsyncInputOperationService {
         }
     }
 
-    private void processOperation(OperationDTO.Request.OperationDto operationDto) {
+    private void processOperation(OperationDTO operationDto) {
         operationService.save(operationDto);
     }
 
-    public boolean addOperation(OperationDTO.Request.OperationDto operationDto) {
+    public boolean addOperation(OperationDTO operationDto) {
         System.out.println("Operation added for processing " + operationDto.getOperationType());
         return operationQueue.offer(operationDto);
     }

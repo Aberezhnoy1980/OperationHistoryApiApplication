@@ -1,19 +1,15 @@
 package ru.aberezhnoy.domain.repository;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.aberezhnoy.contract.Contract;
-import ru.aberezhnoy.domain.model.CashbackOperation;
-import ru.aberezhnoy.domain.model.LoanOperation;
-import ru.aberezhnoy.exception.OperationNotFound;
-import ru.aberezhnoy.domain.model.Operation;
 import ru.aberezhnoy.domain.data.StorageService;
+import ru.aberezhnoy.domain.model.Operation;
+import ru.aberezhnoy.exception.OperationNotFound;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**

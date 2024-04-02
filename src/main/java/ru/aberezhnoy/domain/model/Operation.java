@@ -47,13 +47,14 @@ public abstract class Operation implements Contract.Model.ConsolePrintable {
      * Base constructor
      */
     public Operation(Customer customer, BigDecimal amount, String description) {
-        this.id = null;
         this.operationType = this.getClass().getSimpleName();
         this.customer = customer;
         this.date = LocalDateTime.now();
         this.amount = amount;
         this.description = description;
     }
+
+    public abstract String getType();
 
     /**
      * Method allows to display general operations information in the console.

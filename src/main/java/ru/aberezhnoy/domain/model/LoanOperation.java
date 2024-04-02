@@ -12,16 +12,17 @@ public class LoanOperation extends Operation implements Contract.Model.ConsolePr
         this.loanId = loanId;
     }
 
+    @Override
+    public String getType() {
+        return this.getClass().getSimpleName();
+    }
+
     public LoanOperation() {
         super();
     }
 
     public Long getLoanId() {
         return loanId;
-    }
-
-    public void setLoanId(Long loanId) {
-        this.loanId = loanId;
     }
 
     @Override

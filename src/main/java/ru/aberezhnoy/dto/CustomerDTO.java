@@ -9,7 +9,7 @@ import ru.aberezhnoy.domain.model.Customer;
 
 @NoArgsConstructor
 @Data
-public class CustomerDto {
+public class CustomerDTO {
     private Long id;
     @NotBlank
     private String firstname;
@@ -25,7 +25,7 @@ public class CustomerDto {
     @Digits(integer = 11, fraction = 0)
     private String phoneNumber;
 
-    public CustomerDto(Customer customer) {
+    public CustomerDTO(Customer customer) {
         this.id = customer.getId();
         this.firstname = customer.getFirstname();
         this.lastname = customer.getLastname();

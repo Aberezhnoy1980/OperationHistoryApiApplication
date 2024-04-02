@@ -9,7 +9,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.aberezhnoy.domain.model.Customer;
-import ru.aberezhnoy.dto.CustomerDto;
+import ru.aberezhnoy.dto.CustomerDTO;
 import ru.aberezhnoy.exception.CustomerNotFound;
 import ru.aberezhnoy.exception.DataValidationException;
 import ru.aberezhnoy.service.CustomerService;
@@ -29,13 +29,13 @@ public class CustomerController {
     }
 
     @GetMapping
-    public List<CustomerDto> findAll() {
+    public List<CustomerDTO> findAll() {
         logger.info("Customer list requested");
         return customerService.findAll();
     }
 
     @PostMapping
-    public CustomerDto createCustomer(@RequestBody @Validated CustomerDto customerDto, BindingResult bindingResult) {
+    public CustomerDTO createCustomer(@RequestBody @Validated CustomerDTO customerDto, BindingResult bindingResult) {
         logger.info("Saving  user");
         if (bindingResult.hasErrors()) {
             logger.error(bindingResult.getAllErrors().toString());
@@ -48,7 +48,7 @@ public class CustomerController {
     }
 
     @PutMapping
-    public void updateCustomer(@RequestBody CustomerDto customerDto, BindingResult bindingResult) {
+    public void updateCustomer(@RequestBody CustomerDTO customerDto, BindingResult bindingResult) {
         logger.info("Updating user with id = {}", customerDto.getId());
         if (bindingResult.hasErrors()) {
             logger.error(bindingResult.getAllErrors().toString());
@@ -60,7 +60,7 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    public CustomerDto findById(@PathVariable Long id) {
+    public CustomerDTO findById(@PathVariable Long id) {
         logger.info("User with id = {} requested", id);
         return customerService.findById(id).orElseThrow(() -> new CustomerNotFound(id));
     }
