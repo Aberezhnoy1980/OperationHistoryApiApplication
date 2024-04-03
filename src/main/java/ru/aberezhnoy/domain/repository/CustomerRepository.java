@@ -1,17 +1,15 @@
 package ru.aberezhnoy.domain.repository;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.aberezhnoy.contract.Contract;
-import ru.aberezhnoy.exception.CustomerNotFound;
-import ru.aberezhnoy.domain.model.Customer;
 import ru.aberezhnoy.domain.data.StorageService;
+import ru.aberezhnoy.domain.model.Customer;
+import ru.aberezhnoy.exception.CustomerNotFound;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -39,26 +37,6 @@ public class CustomerRepository implements Contract.Model<Customer> {
     private CustomerRepository(StorageService<Customer> customerStorageService) {
         identity = new AtomicLong(0);
         this.customerStorageService = customerStorageService;
-    }
-
-    /**
-     * Method for create demo data
-     */
-    @PostConstruct
-    public void initStorage() {
-        final Random random = new Random();
-        for (int i = 1; i <= 5; i++) {
-            char prefix = (char) random.nextInt(65, 90);
-            this.save(Customer.builder()
-                    .setFirstname(prefix + "Customer")
-                    .setLastname(prefix + "Cusomerovich")
-                    .setSurname(prefix + "Custumoroff")
-                    .setBirthDate("0" + random.nextInt(1, 10) + "/0" + random.nextInt(1, 9) + "/" + random.nextInt(1960, 2006))
-                    .setGender(i % 2 == 0 ? "male" : "female")
-                    .setEmail(prefix + "Customer" + "_" + prefix + prefix + "@mail.com")
-                    .setPhoneNumber("" + random.nextLong(10_000_000_000L, 99_000_000_000L))
-                    .build());
-        }
     }
 
     /**

@@ -21,6 +21,7 @@ public class OperationDTOMapper implements Function<Operation, OperationDTO> {
         if (operation instanceof LoanOperation loanOperation) {
             return new LoanOperationDTO(loanOperation.getId(),
                     loanOperation.getCustomer().getId(),
+                    loanOperation.getDate(),
                     loanOperation.getAmount(),
                     loanOperation.getLoanId(),
                     loanOperation.getDescription(),
@@ -28,6 +29,7 @@ public class OperationDTOMapper implements Function<Operation, OperationDTO> {
         } else if (operation instanceof CashbackOperation cashbackOperation) {
             return new CashbackOperationDTO(cashbackOperation.getId(),
                     cashbackOperation.getCustomer().getId(),
+                    cashbackOperation.getDate(),
                     cashbackOperation.getAmount(),
                     cashbackOperation.getCashbackAmount(),
                     cashbackOperation.getDescription(),

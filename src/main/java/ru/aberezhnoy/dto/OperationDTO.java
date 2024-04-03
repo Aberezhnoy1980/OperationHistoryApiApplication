@@ -1,18 +1,21 @@
 package ru.aberezhnoy.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 
 public class OperationDTO {
     Long id;
     Long customerId;
+    LocalDateTime date;
     BigDecimal amount;
     String description;
     String operationType;
 
-    public OperationDTO(Long id, Long customerId, BigDecimal amount, String description, String operationType) {
+    public OperationDTO(Long id, Long customerId, LocalDateTime date, BigDecimal amount, String description, String operationType) {
         this.id = id;
         this.customerId = customerId;
+        this.date = date;
         this.amount = amount;
         this.description = description;
         this.operationType = operationType;
@@ -36,5 +39,9 @@ public class OperationDTO {
 
     public String getOperationType() {
         return operationType;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
     }
 }

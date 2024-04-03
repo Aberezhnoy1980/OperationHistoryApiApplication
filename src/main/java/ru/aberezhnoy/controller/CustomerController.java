@@ -43,7 +43,7 @@ public class CustomerController {
                     .map(ObjectError::getDefaultMessage)
                     .collect(Collectors.toList()));
         }
-        Customer customer = customerService.save(customerDto);
+        Customer customer = customerService.create(customerDto);
         return customerService.findById(customer.getId()).orElseThrow(() -> new CustomerNotFound(customer.getId()));
     }
 

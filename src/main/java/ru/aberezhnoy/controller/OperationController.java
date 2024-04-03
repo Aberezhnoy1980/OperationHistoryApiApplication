@@ -8,6 +8,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.aberezhnoy.dto.DemoOperationDTO;
 import ru.aberezhnoy.dto.OperationDTO;
 import ru.aberezhnoy.exception.CustomerNotFound;
 import ru.aberezhnoy.exception.DataValidationException;
@@ -37,7 +38,7 @@ public class OperationController {
     }
 
     @PostMapping
-    public void createOperation(@RequestBody @Validated OperationDTO operationDto, BindingResult bindingResult) {
+    public void createOperation(@RequestBody @Validated DemoOperationDTO demoOperationDto, BindingResult bindingResult) {
         logger.info("Saving  operation");
         if (bindingResult.hasErrors()) {
             logger.error(bindingResult.getAllErrors().toString());
@@ -45,7 +46,7 @@ public class OperationController {
                     .map(ObjectError::getDefaultMessage)
                     .collect(Collectors.toList()));
         }
-        asyncInputOperationService.addOperation(operationDto);
+        asyncInputOperationService.addOperation(demoOperationDto);
     }
 
     @GetMapping("/{id}")

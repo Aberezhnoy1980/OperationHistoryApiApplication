@@ -6,7 +6,8 @@ import ru.aberezhnoy.domain.model.Customer;
 import ru.aberezhnoy.domain.model.Operation;
 import ru.aberezhnoy.dto.CustomerDTO;
 import ru.aberezhnoy.dto.OperationDTO;
-import ru.aberezhnoy.exception.DataSourceException;
+import ru.aberezhnoy.util.mapper.CustomerDTOMapper;
+import ru.aberezhnoy.util.mapper.OperationDTOMapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,19 +17,15 @@ import java.util.stream.Collectors;
  */
 @Service
 public class StatementService {
-    private final CustomerService customerService;
-    private final OperationService operationService;
-    private Map<Customer, Set<Operation>> statement;
-    private final List<Customer> customers;
-    private final List<Operation> operations;
+    private final CustomerDTOMapper customerDTOMapper;
+    private final OperationDTOMapper operationDTOMapper;
+    private final Map<Customer, Set<Operation>> statement;
 
     @Autowired
-    public StatementService(CustomerService customerService1, OperationService operationService1) {
-        this.customerService = customerService1;
-        this.operationService = operationService1;
-        this.customers = customerService.getCustomerRepository().findAll().orElseThrow(DataSourceException::new);
-        this.operations = operationService.getOperationRepository().findAll().orElseThrow(DataSourceException::new);
-        this.statement = buildTransactionsMap();
+    public StatementService(CustomerDTOMapper customerDTOMapper, OperationDTOMapper operationDTOMapper) {
+        this.customerDTOMapper = customerDTOMapper;
+        this.operationDTOMapper = operationDTOMapper;
+        this.statement = new HashMap<>();
     }
 
     public void addCustomer(Customer customer) {
@@ -40,7 +37,7 @@ public class StatementService {
     }
 
     public Set<CustomerDTO> getAllCustomers() {
-        return statement.keySet().stream().map(c -> customerService.getCustomerDTOMapper().apply(c))
+        return statement.keySet().stream().map(customerDTOMapper)
                 .collect(Collectors.toSet());
     }
 
@@ -50,30 +47,17 @@ public class StatementService {
             res.addAll(s);
         }
         return res.stream()
-                .map(operation -> operationService.getOperationDTOMapper().apply(operation))
+                .map(operationDTOMapper)
                 .collect(Collectors.toSet());
     }
 
     public Optional<Set<OperationDTO>> getOperationsByCustomer(long id) {
-        for (Customer c : customers) {
+        for (Customer c : statement.keySet()) {
             if (c.getId() == id)
                 return Optional.of(statement.get(c).stream()
-                        .map(operation -> operationService.getOperationDTOMapper().apply(operation))
+                        .map(operationDTOMapper)
                         .collect(Collectors.toSet()));
         }
         return Optional.empty();
-    }
-
-    private Map<Customer, Set<Operation>> buildTransactionsMap() {
-        this.statement = new HashMap<>();
-        for (Customer customer : customers) {
-            statement.put(customer, customer.getOperations());
-        }
-        return statement;
-    }
-
-    public Map<Customer, Set<Operation>> getMapStatement() {
-        buildTransactionsMap();
-        return statement;
     }
 }

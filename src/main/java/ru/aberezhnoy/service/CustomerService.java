@@ -1,5 +1,6 @@
 package ru.aberezhnoy.service;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.aberezhnoy.contract.Contract;
@@ -12,20 +13,46 @@ import ru.aberezhnoy.util.mapper.CustomerModelMapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
 public class CustomerService {
     private final Contract.Model<Customer> customerRepository;
+    private final StatementService statementService;
     private final CustomerDTOMapper customerDTOMapper;
 
     private final CustomerModelMapper customerModelMapper;
 
     @Autowired
-    public CustomerService(Contract.Model<Customer> customerRepository, CustomerDTOMapper customerDTOMapper, CustomerModelMapper customerModelMapper) {
+    public CustomerService(Contract.Model<Customer> customerRepository,
+                           StatementService statementService,
+                           CustomerDTOMapper customerDTOMapper,
+                           CustomerModelMapper customerModelMapper) {
         this.customerRepository = customerRepository;
+        this.statementService = statementService;
         this.customerDTOMapper = customerDTOMapper;
         this.customerModelMapper = customerModelMapper;
+    }
+
+    /**
+     * Method for create demo data
+     */
+    @PostConstruct
+    public void initStorage() {
+        final Random random = new Random();
+        for (int i = 1; i <= 5; i++) {
+            char prefix = (char) random.nextInt(65, 90);
+            this.create(customerDTOMapper.apply(Customer.builder()
+                    .setFirstname(prefix + "Customer")
+                    .setLastname(prefix + "Cusomerovich")
+                    .setSurname(prefix + "Custumoroff")
+                    .setBirthDate("0" + random.nextInt(1, 10) + "/0" + random.nextInt(1, 9) + "/" + random.nextInt(1960, 2006))
+                    .setGender(i % 2 == 0 ? "male" : "female")
+                    .setEmail(prefix + "Customer" + "_" + prefix + prefix + "@mail.com")
+                    .setPhoneNumber("" + random.nextLong(10_000_000_000L, 99_000_000_000L))
+                    .build()));
+        }
     }
 
     public List<CustomerDTO> findAll() {
@@ -34,40 +61,22 @@ public class CustomerService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Convert Customer entity to Data Transfer Object (DTO)
-     *
-     * @param customer
-     * @return customerDto
-     */
-    private CustomerDTO mapToCustomerDto(Customer customer) {
-        return new CustomerDTO(customer);
-    }
-
-    /**
-     * Convert Data Transfer Object (DTO) to Customer entity
-     *
-     * @param customerDto
-     * @return customer
-     */
-    private Customer mapToCustomer(CustomerDTO customerDto) {
-        return Customer.builder()
-                .setFirstname(customerDto.getFirstname())
-                .setLastname(customerDto.getLastname())
-                .setSurname(customerDto.getSurname())
-                .setBirthDate(customerDto.getBirthDate())
-                .setGender(customerDto.getGender())
-                .setPhoneNumber(customerDto.getPhoneNumber())
-                .setEmail(customerDto.getEmail())
-                .build();
-    }
-
     public Optional<CustomerDTO> findById(long id) {
         return customerRepository.findById(id).map(customerDTOMapper);
     }
 
-    public Customer save(CustomerDTO customerDto) {
-        return customerRepository.save(customerModelMapper.apply(customerDto));
+    public Optional<Customer> findCustomerById(long id) {
+        return customerRepository.findById(id);
+    }
+
+    public Customer create(CustomerDTO customerDto) {
+        Customer customer = customerRepository.save(customerModelMapper.apply(customerDto));
+        save(customer);
+        return customer;
+    }
+
+    public void save(Customer customer) {
+        statementService.addCustomer(customer);
     }
 
     public void update(CustomerDTO customerDto) {
@@ -90,6 +99,7 @@ public class CustomerService {
             customer.setEmail(customerDto.getEmail());
         if (!customer.getPhoneNumber().equals(customerDto.getPhoneNumber()))
             customer.setPhoneNumber(customerDto.getPhoneNumber());
+        statementService.updateCustomer(customer);
     }
 
     public void removeById(long id) {

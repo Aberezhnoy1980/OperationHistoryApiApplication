@@ -1,13 +1,12 @@
 package ru.aberezhnoy.service;
 
 import jakarta.annotation.PostConstruct;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.aberezhnoy.config.OperationProperties;
-import ru.aberezhnoy.dto.OperationDTO;
+import ru.aberezhnoy.dto.DemoOperationDTO;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -16,7 +15,7 @@ import java.util.Queue;
 public class AsyncInputOperationService {
     private static final Logger LOGGER = LogManager.getLogger(AsyncInputOperationService.class);
     private final OperationProperties operationProperties;
-    private final Queue<OperationDTO> operationQueue;
+    private final Queue<DemoOperationDTO> operationQueue;
     private final OperationService operationService;
 
     @Autowired
@@ -38,8 +37,8 @@ public class AsyncInputOperationService {
 
     private void processQueue() {
         while (true) {
-            OperationDTO operationDto = operationQueue.poll();
-            if (operationDto == null) {
+            DemoOperationDTO demoOperationDto = operationQueue.poll();
+            if (demoOperationDto == null) {
                 try {
                     LOGGER.info("Waiting for next operation in queue");
                     Thread.sleep(operationProperties.getSleepMilliSeconds());
@@ -47,18 +46,18 @@ public class AsyncInputOperationService {
                     throw new RuntimeException(e);
                 }
             } else {
-                System.out.println("Processing operation: " + operationDto.getOperationType());
-                processOperation(operationDto);
+                LOGGER.info("Processing operation: {}", demoOperationDto.getOperationType());
+                processOperation(demoOperationDto);
             }
         }
     }
 
-    private void processOperation(OperationDTO operationDto) {
-        operationService.save(operationDto);
+    private void processOperation(DemoOperationDTO demoOperationDto) {
+        operationService.create(demoOperationDto);
     }
 
-    public boolean addOperation(OperationDTO operationDto) {
-        System.out.println("Operation added for processing " + operationDto.getOperationType());
-        return operationQueue.offer(operationDto);
+    public boolean addOperation(DemoOperationDTO demoOperationDto) {
+        System.out.println("Operation added for processing " + demoOperationDto.getOperationType());
+        return operationQueue.offer(demoOperationDto);
     }
 }
